@@ -1,0 +1,122 @@
+name: Sync Drafts to Zenn & Qiita
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "drafts/**"
+      - "src/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/sync.yml"
+  schedule:
+    # 予約公開 (publish_at) を 1 時間ごとに評価する。
+    # convert.js が publish_at <= now の draft を LIVE として処理する。
+    - cron: "0 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# main / deploy の両方への push 操作が並走しないように直列化
+concurrency:
+  group: synclore-sync-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      DEPLOY_DIR: .deploy
+    steps:
+      # main: ソース (drafts/, src/, sync.yml) の checkout
+      - name: Checkout main (sources)
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 1
+
+      # deploy: 生成物 (articles/, public/, images/) の checkout
+      # 別ディレクトリ .deploy/ にチェックアウトすることで main の working tree
+      # に articles/ などが生えないようにする (Option A の核心)。
+      - name: Checkout deploy (artifacts)
+        uses: actions/checkout@v6
+        with:
+          ref: deploy
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: ${{ env.DEPLOY_DIR }}
+          fetch-depth: 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      # drafts/<slug>.md に delete:true がある記事を完全削除する。
+      # qiita publish --all より前に走らせないと syncArticlesFromQiita で
+      # public/<slug>.md が復活してしまう。
+      - name: Process deletions (Qiita API DELETE + repo cleanup)
+        env:
+          QIITA_TOKEN: ${{ secrets.QIITA_TOKEN }}
+          SYNCLORE_DEPLOY_ROOT: ${{ github.workspace }}/${{ env.DEPLOY_DIR }}
+        run: node src/synclore-delete.js
+
+      # drafts/*.md を .deploy/{articles,public,images}/ に冪等変換
+      - name: Convert drafts -> .deploy/{articles,public,images}/
+        env:
+          SYNCLORE_DEPLOY_ROOT: ${{ github.workspace }}/${{ env.DEPLOY_DIR }}
+        run: node src/convert.js
+
+      # 公開記事の一覧を .deploy/INDEX.md に出力 (執筆履歴ページ)。
+      # GITHUB_REPOSITORY の owner から Qiita / Zenn の URL を組む。
+      # QIITA_USERNAME / ZENN_USERNAME を repo variables で設定すれば上書きできる。
+      - name: Build INDEX.md (article history)
+        env:
+          SYNCLORE_DEPLOY_ROOT: ${{ github.workspace }}/${{ env.DEPLOY_DIR }}
+          QIITA_USERNAME: ${{ vars.QIITA_USERNAME }}
+          ZENN_USERNAME: ${{ vars.ZENN_USERNAME }}
+        run: node src/build-index.js
+
+      # qiita-cli は cwd の public/ を読むので .deploy/ から実行する。
+      # node_modules は main 側に npm ci 済みなので symlink で共有。
+      # package.json も qiita-cli が package 名解決に参照するので link しておく。
+      - name: Publish to Qiita (writes back ids to .deploy/public/)
+        env:
+          QIITA_TOKEN: ${{ secrets.QIITA_TOKEN }}
+        run: |
+          if [ -z "${QIITA_TOKEN}" ]; then
+            echo "::error::QIITA_TOKEN secret is not set."
+            exit 1
+          fi
+          ln -sfn "${{ github.workspace }}/node_modules" "${{ env.DEPLOY_DIR }}/node_modules"
+          ln -sfn "${{ github.workspace }}/package.json" "${{ env.DEPLOY_DIR }}/package.json"
+          ln -sfn "${{ github.workspace }}/package-lock.json" "${{ env.DEPLOY_DIR }}/package-lock.json"
+          cd "${{ env.DEPLOY_DIR }}"
+          echo "QIITA_TOKEN=${QIITA_TOKEN}" > .env
+          # --force で qiita-cli の isOlderThanRemote チェックを skip。
+          # SyncLore は drafts/ が SSoT なので Qiita 側の手編集は想定外、
+          # updated_at の比較で publish が止まると詰まるため強制上書きする。
+          npx qiita publish --all --force
+          rm -f .env
+          rm -f node_modules package.json package-lock.json
+
+      # deploy は CI 専用の dump branch (gh-pages 同等)。PR を経由せず直 push。
+      # 直 push にしている理由: PR 経由だと毎回 "Compare & pull request" 通知が
+      # 出てうるさいため。deploy branch には branch protection を付けない前提。
+      - name: Push generated outputs to deploy
+        working-directory: ${{ env.DEPLOY_DIR }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No generated changes."
+          else
+            git commit -m "[CI] sync articles from drafts"
+            git push origin deploy
+          fi

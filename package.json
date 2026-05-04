@@ -1,0 +1,36 @@
+{
+  "name": "synclore",
+  "version": "1.0.0",
+  "description": "Repository for deploying articles to Qiita and Zenn",
+  "main": "index.js",
+  "scripts": {
+    "analytics": "node src/analytics.js",
+    "convert": "node src/convert.js",
+    "dry-run": "node src/dry-run.js",
+    "delete": "node src/synclore-delete.js",
+    "index": "node src/build-index.js",
+    "init:fork": "node src/init-fork.js",
+    "lint": "node src/lint.js",
+    "new": "node src/new.js",
+    "preview:qiita": "npx qiita preview",
+    "preview:zenn": "npx zenn preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sotashimozono/SyncLore.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/sotashimozono/SyncLore/issues"
+  },
+  "homepage": "https://github.com/sotashimozono/SyncLore#readme",
+  "dependencies": {
+    "@iarna/toml": "^2.2.5",
+    "@qiita/qiita-cli": "^1.8.0",
+    "gray-matter": "^4.0.3",
+    "zenn-cli": "^0.4.6"
+  }
+}
