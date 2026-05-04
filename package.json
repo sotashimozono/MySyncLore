@@ -1,5 +1,5 @@
 {
-  "name": "synclore",
+  "name": "mysynclore",
   "version": "1.0.0",
   "description": "Repository for deploying articles to Qiita and Zenn",
   "main": "index.js",
@@ -17,16 +17,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sotashimozono/SyncLore.git"
+    "url": "git+https://github.com/sotashimozono/MySyncLore.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/sotashimozono/SyncLore/issues"
+    "url": "https://github.com/sotashimozono/MySyncLore/issues"
   },
-  "homepage": "https://github.com/sotashimozono/SyncLore#readme",
+  "homepage": "https://github.com/sotashimozono/MySyncLore#readme",
   "dependencies": {
     "@iarna/toml": "^2.2.5",
     "@qiita/qiita-cli": "^1.8.0",
