@@ -1,5 +1,5 @@
 ---
-title: "Obsidian の vault を SSH リモートで直接編集できるプラグインを作った"
+title: "Obsidian の vault を SSH remoteで直接編集できるプラグインを作った"
 emoji: "🔌"
 type: "tech"
 topics: ["obsidian", "ssh", "plugin", "remote", "typescript"]
@@ -10,36 +10,37 @@ qiita_id: ""
 
 ## はじめに
 
-研究者として、データやログの大半は計算機サーバ側にあります。一方ノートは Obsidian で取りたい — markdown の plain text、Dataview や Templater のおかげで構造化できる、ローカル動作で速い、複数 device 間 sync は Obsidian Sync か Syncthing で何とかなる。
+科学技術計算をしていると、データやログの大半は計算機サーバ側にあるという状況が度々あります。一方ノートは Obsidian で管理したい — markdown の plain text、Dataview や Templater のおかげで構造化できる、local動作で速い、複数 device 間 sync は Obsidian Sync か Syncthing で何とかなる。
 
-ただ、**「ノートはローカル / データはリモート」という二重管理**が長年の悩みでした。実験ログを書くたびに「`data/` 配下を `scp` するか… いや `rsync` で増分か… いや SyncThing でフォルダを mirror するか…」と毎回手段を選び直していました。どの選択肢も「リモートサーバが正、ローカルは作業面」という workflow とは噛み合いません。
+これを実現しようとすると、`remotely-save` や `obsidian-git` などのpluginを使う必要がありますが、これらの方法では **「ノートはlocal / データはremote」というギャップ** が悩みでした。実験ログを書くたびに `data/` 配下を `scp` か `rsync` するかとか考えるのも面倒だし、できることなら remote で直接 obsidian の作業環境で作業できれば良いところです。既存のどの選択肢も「remote に data を保存し、local は作業のみ」という workflow とは噛み合いません。
 
 なので作りました。
 
-**Obsidian Remote SSH** — Obsidian の vault を **SSH ホスト上にだけ置いた状態で**、ローカル Obsidian から直接編集できるプラグインです。VS Code Remote-SSH と同じ発想を Obsidian に持ち込んだもの、と捉えてもらうと正確です。
+**Obsidian Remote SSH** — Obsidian の vault を **SSH ホスト上にだけ置いた状態で**、local Obsidian から直接編集できるプラグインです。VS Code Remote-SSH と同じ発想を Obsidian に持ち込んだもの、を意識して作ったのでそう理解するとよいかもしれません。
 
 GitHub: [sotashimozono/obsidian-remote-ssh](https://github.com/sotashimozono/obsidian-remote-ssh)
 
-![Demo: SSH リモートの vault を Obsidian で開いて新規ノートを書く](https://raw.githubusercontent.com/sotashimozono/obsidian-remote-ssh/media/demo.gif)
+![Demo: SSH remoteの vault を Obsidian で開いて新規ノートを書く](https://raw.githubusercontent.com/sotashimozono/obsidian-remote-ssh/media/demo.gif)
 
-GIF 内では:
+gif では:
 
-1. ローカル vault に `local_demo*.md` が並んだ状態
+1. local vault に `local_demo*.md` が並んだ状態
 2. **コマンドパレット** → `Remote SSH: Connect` → SSH 接続
-3. **shadow window** が開き、file explorer が `remote_demo*.md` (= リモートサーバの実ファイル) に切り替わる
-4. `Ctrl+N` → 新規ノート → タイピング → Obsidian の autosave がリモートに書き込み
+3. **shadow window** が開き、file explorer が `remote_demo*.md` (= remoteサーバの実ファイル) に切り替わる
+4. `Ctrl+N` → 新規ノート → タイピング → Obsidian の autosave がremoteに書き込み
 
 最後の write が本物であることは E2E テストで SFTP 経由で別途検証してあります。
 
 ## なぜ作ったか — 既存解との差分
 
-似た目的のツール / アプローチは存在しますが、研究者の workflow に決定的に欠ける要素がそれぞれありました。
+似た目的のツール / アプローチは存在しますが、実用的な workflow を考えると決定的に欠ける要素がそれぞれありました。
 
 ### Obsidian Sync / Syncthing / iCloud / Dropbox
 
-- **ローカルに完全 replica** を持つ前提。100 GB の実験データを vault に含めると、ラップトップが死ぬ
-- リモート計算機 ↔ Obsidian の同期は人間がトリガーする必要がある
-- 計算機が dev branch / production branch みたいに複数台あると、「どこが正?」 が崩壊する
+- **localに完全 replica** を持つ前提。100 GB の実験データを vault に含めると、laptopが死ぬ
+    - 実験データを移さないこともできるが、面倒 (当社比)
+- remote計算機 ↔ Obsidian の同期がめんどくさい (そもそも remote で作業すればよいじゃん)
+- 計算機が dev branch / production branch みたいに複数台あると崩壊する
 
 ### sshfs / NFS / Samba mount
 
@@ -59,19 +60,19 @@ GIF 内では:
 
 このプラグインの方針:
 
-- **ローカル replica を作らない** — vault は SSH ホスト側にだけ存在する
-- 専用の **Go daemon** をリモートに常駐させ、SFTP より細粒度な RPC で読み書きする
-- ローカル Obsidian は通常の Obsidian window として動作する。Dataview / Templater / Canvas / 他のコミュニティプラグインがそのまま動く
+- **local replica を作らない** — vault は SSH ホスト側にだけ存在する
+- 専用の **Go daemon** をremoteに常駐させ、SFTP より細粒度な RPC で読み書きする
+- local Obsidian は通常の Obsidian window として動作する。Dataview / Templater / Canvas / 他のコミュニティプラグインがそのまま動く
 - ネットワーク断は内部キューで吸収する
 
 ## 主要機能
 
 | | |
 |---|---|
-| **No local replica** | vault は SSH ホスト側のみ、ローカルは vault adapter のキャッシュ |
+| **No local replica** | vault は SSH ホスト側のみ、localは vault adapter のキャッシュ |
 | **Go-powered backend** | サーバ側に常駐する Go daemon が file ops を捌く。SFTP より高速 |
-| **Standard Obsidian UI** | 接続するとローカル Obsidian と区別がつかない `shadow vault` window が立つ |
-| **fs.watch propagation** | リモート側の `vim` 編集等もリアルタイムで Obsidian の File Explorer に反映 |
+| **Standard Obsidian UI** | 接続するとlocal Obsidian と区別がつかない `shadow vault` window が立つ |
+| **fs.watch propagation** | remote側の `vim` 編集等もリアルタイムで Obsidian の File Explorer に反映 |
 | **3-way merge UI** | 複数マシンから同時編集して衝突したら、ancestor / mine / theirs パネルで解決 |
 | **Network-resilient** | 切断中の writes を spool、再接続時に flush。冪等なファイル単位 |
 | **Multi-machine** | `workspace.json` などの client-local 状態を per-host subtree に分離 |
@@ -87,7 +88,7 @@ GIF 内では:
 4. Command palette → Remote SSH: Connect → プロファイル選択
 ```
 
-最低限必要なリモート側の前提:
+最低限必要なremote側の前提:
 
 - SSH 接続できる Linux または macOS
 - `~/.ssh/authorized_keys` が普通に動くこと
@@ -98,16 +99,17 @@ GIF 内では:
 ## 状態 — pre-1.0 / Obsidian Community Store 申請中
 
 - v1.0.0 は cut 済み、`minAppVersion: 1.5.0`
-- E2E は per-PR で本物のリモート vault に対して連結 → 切断 → 編集 → 反映 まで検証 (`continue-on-error` なし)
+- E2E は per-PR で本物のremote vault に対して連結 → 切断 → 編集 → 反映 まで検証 (`continue-on-error` なし)
 - Obsidian Community Plugins への登録は [obsidianmd/obsidian-releases#12390](https://github.com/obsidianmd/obsidian-releases/pull/12390) で申請中、現在 Obsidian チームのレビュー待ち
 
 承認後は Obsidian の Community Plugins ブラウザから直接インストールできるようになります。それまでは BRAT が一番楽です。
 
 ## まとめ
 
-「ノートはローカル、データはリモート」を 1 本化したかった。`scp` / `rsync` を毎回打ちたくなかった。Obsidian の機能を諦めたくなかった。VS Code Remote-SSH のあの体験が Obsidian にも欲しかった。
+「ノートはlocal、データはremote」を 1 本化したかった。`scp` / `rsync` を毎回打ちたくなかった。
+Obsidian に VSCode Remote-SSH の体験が欲しかった。
 
-そういうモチベでこのプラグインを書きました。研究者・remote server を日常的に使う人 (ML 研究、HPC 利用、リモート NAS 運用、homelab) に刺さる predictionです。
+そういうモチベでこのプラグインを書きました。研究者・remote server を日常的に使う人 (ML 研究、HPC 利用、remote NAS 運用、homelab) に刺さるといいな。
 
 バグ報告・プラグイン互換性レポート・feature request、何でも歓迎します。
 
