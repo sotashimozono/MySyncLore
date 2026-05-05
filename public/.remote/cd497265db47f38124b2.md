@@ -7,7 +7,7 @@ tags:
   - arXiv
   - paper-management
 private: false
-updated_at: '2026-05-05T14:38:01+09:00'
+updated_at: '2026-05-05T14:49:40+09:00'
 id: cd497265db47f38124b2
 organization_url_name: null
 slide: false
@@ -179,4 +179,6 @@ issue / PR 歓迎です。
 > ただし記事本文の著作権はすべて筆者に帰属し、無断転載・再利用を禁じます。
 > 記事の内容は執筆時点のものであり、正確性・完全性を保証しません。
 > 本記事の利用によって生じたいかなる損害についても筆者は責任を負いません。
+
+<sub>この記事は [SyncLore](https://github.com/sotashimozono/SyncLore) を使って管理しています。</sub>
 <!-- SYNCLORE_DISCLAIMER_END -->
