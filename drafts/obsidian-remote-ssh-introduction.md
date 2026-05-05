@@ -25,7 +25,7 @@ GitHub: [sotashimozono/obsidian-remote-ssh](https://github.com/sotashimozono/obs
 gif では:
 
 1. local vault に `local_demo*.md` が並んだ状態
-2. **コマンドパレット** → `Remote SSH: Connect` → SSH 接続
+2. コマンドパレット → `Remote SSH: Connect` → SSH 接続
 3. **shadow window** が開き、file explorer が `remote_demo*.md` (= remoteサーバの実ファイル) に切り替わる
 4. `Ctrl+N` → 新規ノート → タイピング → Obsidian の autosave がremoteに書き込み
 
@@ -41,7 +41,7 @@ local vault を保持しつつ、S3 / WebDAV / Dropbox / OneDrive 等と sync �
 
 - **local replica を持つ前提** — 100 GB の実験データを vault に含めると laptop が死ぬ
 - 同期トリガーは手動 or 定期ポーリングで、ジョブが吐いた新しい結果が Obsidian にすぐ現れない
-- 結局「local が正か remote が正か」 の判断を都度しなきゃいけない
+- 結局 local と remote どちらが正しいか の判断を都度しなきゃいけない
 
 ### `obsidian-git`
 
