@@ -7,3 +7,4 @@ public/
 images/
 # Local worktree of the deploy branch (created by `git worktree add .deploy deploy`).
 .deploy/
+package-lock.json
