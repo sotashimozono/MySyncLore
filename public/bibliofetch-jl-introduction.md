@@ -1,5 +1,5 @@
 ---
-title: BiblioFetch.jl を作った — DOI と arXiv id を投げると PDF と BibTeX が揃う Julia パッケージ
+title: 'BiblioFetch.jl: DOI と arXiv id を投げると PDF と BibTeX が揃う Julia パッケージ'
 tags:
   - Julia
   - OSS
@@ -7,7 +7,7 @@ tags:
   - arXiv
   - paper-management
 private: false
-updated_at: '2026-05-05T14:29:41+09:00'
+updated_at: '2026-05-05T14:35:40+09:00'
 id: cd497265db47f38124b2
 organization_url_name: null
 slide: false
