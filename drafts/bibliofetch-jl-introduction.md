@@ -1,5 +1,5 @@
 ---
-title: "BiblioFetch.jl を作った — DOI と arXiv id を投げると PDF と BibTeX が揃う Julia パッケージ"
+title: "BiblioFetch.jl: DOI と arXiv id を投げると PDF と BibTeX が揃う Julia パッケージ"
 emoji: "📚"
 type: "tech"
 topics: ["julia", "oss", "bibtex", "arxiv", "paper-management"]

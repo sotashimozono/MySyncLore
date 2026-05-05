@@ -1,5 +1,5 @@
 ---
-title: "BiblioFetch.jl の strict モード — preprint と version of record を区別して APS / Elsevier / Springer から確実に取る"
+title: "BiblioFetch.jl の strict モード: APS / Elsevier / Springer から VoR を確実に取る"
 emoji: "🔒"
 type: "tech"
 topics: ["julia", "bibtex", "openaccess", "paper-management", "research"]
