@@ -31,37 +31,41 @@ gif では:
 
 最後の write が本物であることは E2E テストで SFTP 経由で別途検証してあります。
 
-## なぜ作ったか — 既存解との差分
+## なぜ作ったか — 既存 plugin との差分
 
-似た目的のツール / アプローチは存在しますが、実用的な workflow を考えると決定的に欠ける要素がそれぞれありました。
+remote 上の markdown を Obsidian で扱おうとするとき、既に candidates はいくつかあります。実際に試したうえで「自分の workflow には合わない」と感じた点を挙げます。
 
-### Obsidian Sync / Syncthing / iCloud / Dropbox
+### `remotely-save`
 
-- **localに完全 replica** を持つ前提。100 GB の実験データを vault に含めると、laptopが死ぬ
-    - 実験データを移さないこともできるが、面倒 (当社比)
-- remote計算機 ↔ Obsidian の同期がめんどくさい (そもそも remote で作業すればよいじゃん)
-- 計算機が dev branch / production branch みたいに複数台あると崩壊する
+local vault を保持しつつ、S3 / WebDAV / Dropbox / OneDrive 等と sync する plugin。素晴らしい plugin だが:
 
-### sshfs / NFS / Samba mount
+- **local replica を持つ前提** — 100 GB の実験データを vault に含めると laptop が死ぬ
+- 同期トリガーは手動 or 定期ポーリングで、ジョブが吐いた新しい結果が Obsidian にすぐ現れない
+- 結局「local が正か remote が正か」 の判断を都度しなきゃいけない
 
-- mount point が落ちるとアプリごと固まる
-- `fs.watch` 系がよく死ぬ (Obsidian の reflect が来ない)
-- macOS の sshfs は近年メンテが厳しい
+### `obsidian-git`
+
+vault を git repo として扱い push / pull で同期する plugin。これも素晴らしいが:
+
+- ノートを書くたびに `commit` の人間判断が挟まる
+- 競合解決を Obsidian 内でやりたくない (vault に巨大 data も入ってると merge 大変)
+- やはり local replica が前提
 
 ### VS Code Remote-SSH
 
-- 編集はできるが Obsidian の機能 (Dataview, Graph, Canvas, theme) は使えない
+remote で直接編集できるという意味では一番近い体験。**実体験として、これは VS Code 上では完璧に動く**。だからこの plugin の発想ごと持ってきた。ただ、
+
+- Obsidian の機能 (Dataview / Graph / Canvas / theme / community plugins) が使えない
 - markdown の preview / wikilink の解決が WYSIWYG じゃない
 
-### rsync / git で運用
+ので Obsidian で同じ体験が欲しかった。
 
-- ノート側に commit が走るたびに人間の判断が要る
-- 競合解決を vault でやりたくない
+---
 
 このプラグインの方針:
 
 - **local replica を作らない** — vault は SSH ホスト側にだけ存在する
-- 専用の **Go daemon** をremoteに常駐させ、SFTP より細粒度な RPC で読み書きする
+- 専用の **Go daemon** を remote に常駐させ、SFTP より細粒度な RPC で読み書きする
 - local Obsidian は通常の Obsidian window として動作する。Dataview / Templater / Canvas / 他のコミュニティプラグインがそのまま動く
 - ネットワーク断は内部キューで吸収する
 
