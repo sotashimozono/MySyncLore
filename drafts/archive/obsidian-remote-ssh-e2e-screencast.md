@@ -12,9 +12,9 @@ qiita_id: ""
 
 これまで [紹介](https://zenn.dev/sotashimozono/articles/obsidian-remote-ssh-introduction) / [内部設計](https://zenn.dev/sotashimozono/articles/obsidian-remote-ssh-architecture) / [研究 workflow](https://zenn.dev/sotashimozono/articles/obsidian-remote-ssh-research-workflow) について書いてきた [obsidian-remote-ssh](https://github.com/sotashimozono/obsidian-remote-ssh) シリーズの最終回です。
 
-今回は **本プラグインの E2E テスト** の話です — Obsidian (Electron アプリ) 上で動作するプラグインを Playwright で end-to-end 検証し、ついでに README 用のデモ GIF まで自動生成する方法。
+今回は本プラグインの E2E テストの話です — Obsidian (Electron アプリ) 上で動作するプラグインを Playwright で end-to-end 検証し、ついでに README 用のデモ GIF まで自動生成する方法。
 
-書く動機: **Obsidian / Electron 系の E2E は資料がほぼ無い**。Web の Playwright 記事は山ほどあるが、`chromium.connectOverCDP` で Electron に attach する話、shadow window を捕まえる話、CDP `Page.startScreencast` で GIF を作る話、どれも繋がった記事が見つからなかった。同じ問題に当たる人のために残します。
+書く動機: Obsidian / Electron 系の E2E は資料がほぼ無い。Web の Playwright 記事は山ほどあるんですが、`chromium.connectOverCDP` で Electron に attach する話、shadow window を捕まえる話、CDP `Page.startScreencast` で GIF を作る話、どれも繋がった記事が見つからなかった。同じ問題に当たる人のために残します。
 
 おまけ: 「fake-green」 (E2E が CI 上で落ちてないように見えて実は何も走ってない) を発見したときの話も書きます。
 
@@ -103,13 +103,13 @@ await page.waitForFunction(
 );
 ```
 
-`enabledPlugins.has(id)` を見ると **意図** しか確認できない (community-plugins.json に載った瞬間 true)。実 `onload()` が走ったかどうかは **commands の登録** を見るのが確実、というのが教訓。
+`enabledPlugins.has(id)` を見ると意図しか確認できない (community-plugins.json に載った瞬間 true)。実 `onload()` が走ったかどうかは commands の登録を見るのが確実、というのが教訓。
 
 ## 3. Shadow window の捕まえ方
 
-このプラグインは connect 成功時に **新しい Electron BrowserWindow** を立ち上げます (前回の architecture 記事参照)。問題は **新 window が同じ CDP debugging port に出てこない** こと。Obsidian は vault isolation のために shadow vault を別 process で起動するので、`browser.contexts()` は片方しか見えません。
+このプラグインは connect 成功時に新しい Electron BrowserWindow を立ち上げます (前回の architecture 記事参照)。問題は新 window が同じ CDP debugging port に出てこないこと。Obsidian は vault isolation のために shadow vault を別 process で起動するので、`browser.contexts()` は片方しか見えません。
 
-回避策: `~/.config/obsidian/obsidian.json` を polling して、scaffold じゃない vault エントリが出現したら、**original Obsidian を kill して shadow vault path で再起動**:
+回避策: `~/.config/obsidian/obsidian.json` を polling して、scaffold じゃない vault エントリが出現したら、original Obsidian を kill して shadow vault path で再起動する:
 
 ```typescript
 export async function findShadowVaultPath(
@@ -140,15 +140,15 @@ export async function findShadowVaultPath(
 }
 ```
 
-`fs.existsSync` でハマったポイント: spec 横断で obsidian.json が累積して、過去 spec の **削除済み scaffold path** を引いてしまう事故が起きる。実在チェック必須。`ts` の最大値を採るのも保険。
+`fs.existsSync` でハマったポイント: spec 横断で obsidian.json が累積して、過去 spec の削除済み scaffold path を引いてしまう事故が起きる。実在チェック必須。`ts` の最大値を採るのも保険。
 
 ## 4. CDP `Page.startScreencast` で GIF を作る
 
 ここが今回一番面白いところ。
 
-最初は `ffmpeg -f x11grab` で Xvfb の画面を録画する方針でした。が、Electron + CDP + Xvfb の組み合わせでは **画面が真っ黒** にしか録れません (CDP 駆動だと paint が off-screen surface に行くらしい)。
+最初は `ffmpeg -f x11grab` で Xvfb の画面を録画する方針でした。が、Electron + CDP + Xvfb の組み合わせでは画面が真っ黒にしか録れません (CDP 駆動だと paint が off-screen surface に行くらしい)。
 
-代わりに **CDP の `Page.startScreencast`** を使うと natural rate でフレームが流れてきます:
+代わりに CDP の `Page.startScreencast` を使うと natural rate でフレームが流れてきます:
 
 ```typescript
 const session = await page.context().newCDPSession(page);
@@ -172,7 +172,7 @@ await session.send('Page.startScreencast' as never, {
 await session.send('Page.stopScreencast' as never);
 ```
 
-各フレームに **タイムスタンプ** を付けて保存し、ffmpeg の `concat` demuxer で per-frame duration を制御:
+各フレームに timestamp を付けて保存し、ffmpeg の `concat` demuxer で per-frame duration を制御:
 
 ```bash
 # concat.txt
@@ -191,7 +191,7 @@ ffmpeg -y -f concat -safe 0 -i concat.txt -i /tmp/palette.png \
   -loop 0 /tmp/demo.gif
 ```
 
-natural-rate のフレーム + 自然な待ち時間で、**滑らかな demo GIF** が出来上がります。10 fps に resample することでファイルサイズも abuse しない。
+natural-rate のフレーム + 自然な待ち時間で、滑らかな demo GIF が出来上がります。10 fps に resample することでファイルサイズも abuse しない。
 
 最終形 (実物): <https://raw.githubusercontent.com/sotashimozono/obsidian-remote-ssh/media/demo.gif>
 
@@ -199,7 +199,7 @@ natural-rate のフレーム + 自然な待ち時間で、**滑らかな demo GI
 
 このシリーズで一番痛かった発見:
 
-> 数日 nightly E2E が "✓ green" になっていたが、実は **Obsidian がそもそも boot しておらず、smoke test 5 つ全部が silent skip** していた。
+> 数日 nightly E2E が "✓ green" になっていたが、実は Obsidian がそもそも boot しておらず、smoke test 5 つ全部が silent skip していた。
 
 原因の連鎖:
 
@@ -209,24 +209,24 @@ natural-rate のフレーム + 自然な待ち時間で、**滑らかな demo GI
 4. `--appimage-extract` が失敗するが、`|| true` で suppress
 5. 後段の Playwright が `spawn ENOENT` で落ちる
 6. しかし `Run E2E smoke tests` step に `continue-on-error: true` が付いていて、workflow は ✓ green
-7. 結果として **3 日連続 fake-green**
+7. 結果として 3 日連続 fake-green
 
 修正:
 
-- nightly cron を **per-PR トリガー + paths-filter** に変更
+- nightly cron を per-PR トリガー + paths-filter に変更
 - `continue-on-error: true` を削除 → 失敗が本物の status check として現れる
 - AppImage download に `-f` 追加 (4xx で fail loud)
 - AppImage 検証ステップ追加 (`file ~/obsidian/Obsidian.AppImage | grep ELF`)
 - 週次 cron は別 workflow として残し、environment drift を捕捉する sentinel に
 
-教訓: **CI が緑だからといって、テストが走っているとは限らない**。`continue-on-error: true` を見たら、何のために付いてるか説明できないなら捨てる。
+教訓: CI が緑だからといって、テストが走っているとは限らない。`continue-on-error: true` を見たら、何のために付いてるか説明できないなら捨てる。
 
 ## まとめ
 
 - Electron に Playwright を後付け attach する: `--remote-debugging-port` + `chromium.connectOverCDP`
 - community plugins は `app.plugins` API で強制有効化、`commands` 登録で実 load を確認
 - Obsidian の shadow window は **kill + relaunch** で別途 attach する戦術
-- 画面録画は **CDP `Page.startScreencast`** が安定。フレーム timestamp を ffmpeg `concat` の `duration` に変換すれば自然な GIF
+- 画面録画は CDP `Page.startScreencast` が安定。フレーム timestamp を ffmpeg `concat` の `duration` に変換すれば自然な GIF
 - `continue-on-error: true` を疑え
 
 このシリーズはこれで一旦終わりです。プラグイン本体は Obsidian Community Store の registry PR ([obsidianmd/obsidian-releases#12390](https://github.com/obsidianmd/obsidian-releases/pull/12390)) が承認されれば直接インストール可能になります。それまでは BRAT 経由でどうぞ。
