@@ -7,7 +7,7 @@ tags:
   - paper-management
   - openaccess
 private: false
-updated_at: '2026-05-16T16:57:12+09:00'
+updated_at: '2026-05-16T18:41:14+09:00'
 id: 3d073a33b0cabc2d19d9
 organization_url_name: null
 slide: false
