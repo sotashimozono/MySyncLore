@@ -1,5 +1,5 @@
 ---
-title: "AI エージェントが doiget を実際に回して Ising 模型の繰り込み群を集めてみた（そして自分の無知に気づいた話）"
+title: "AI coding agent (Claude Code) 目線の doiget を用いた local ベース先行研究調査"
 emoji: "🪜"
 type: "tech"
 topics: ["doiget", "renormalization", "ising", "oss", "paper-management"]
