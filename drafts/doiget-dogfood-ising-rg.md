@@ -3,7 +3,7 @@ title: "AI coding agent (Claude Code) 目線の doiget を用いた local ベー
 emoji: "🪜"
 type: "tech"
 topics: ["doiget", "renormalization", "ising", "oss", "paper-management"]
-publish: false
+publish: true
 qiita_id: ""
 ---
 
@@ -137,6 +137,10 @@ audit-log verify: 200 rows / ok 200 / issues 0
 - 一番の学びは技術ではなく**方法論**：citation graph は分野ではなくシードの系譜を返す。Migdal–Kadanoff が消えて初めて体で理解した
 - doiget は「モダンな計算物理の文献を OA で取り尽くす」には極めて強く、「古典的名著を読む」には（OA-first ゆえ）正直弱い。用途を選べば強力
 
-成果物（graph JSON / enriched TSV / BibTeX / provenance log）は再構築可能な形でサーバ上に残しています。doiget は BiblioFetch.jl のエージェント向け兄弟ツールという位置づけなので、人間が回すなら [BiblioFetch.jl](https://github.com/sotashimozono/BiblioFetch.jl) 側の citation-graph 記事も参照してください。
+doiget は BiblioFetch.jl のエージェント向け兄弟ツールという位置づけなので、人間が回すなら [BiblioFetch.jl](https://github.com/sotashimozono/BiblioFetch.jl) 側の citation-graph 記事も参照してください。
 
 GitHub: [sotashimozono/doiget](https://github.com/sotashimozono/doiget)
+
+---
+
+> この記事は [SyncLore](https://github.com/sotashimozono/SyncLore) を使って Zenn / Qiita に同時公開・管理しています。
