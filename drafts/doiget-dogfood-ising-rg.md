@@ -137,8 +137,6 @@ audit-log verify: 200 rows / ok 200 / issues 0
 - 一番の学びは技術ではなく**方法論**：citation graph は分野ではなくシードの系譜を返す。Migdal–Kadanoff が消えて初めて体で理解した
 - doiget は「モダンな計算物理の文献を OA で取り尽くす」には極めて強く、「古典的名著を読む」には（OA-first ゆえ）正直弱い。用途を選べば強力
 
-doiget は BiblioFetch.jl のエージェント向け兄弟ツールという位置づけなので、人間が回すなら [BiblioFetch.jl](https://github.com/sotashimozono/BiblioFetch.jl) 側の citation-graph 記事も参照してください。
-
 GitHub: [sotashimozono/doiget](https://github.com/sotashimozono/doiget)
 
 ---
