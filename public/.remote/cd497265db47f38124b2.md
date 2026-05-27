@@ -7,7 +7,7 @@ tags:
   - arXiv
   - paper-management
 private: false
-updated_at: '2026-05-28T05:09:14+09:00'
+updated_at: '2026-05-28T07:28:16+09:00'
 id: cd497265db47f38124b2
 organization_url_name: null
 slide: false
