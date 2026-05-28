@@ -7,7 +7,7 @@ tags:
   - Remote
   - Obsidian
 private: false
-updated_at: '2026-05-28T08:57:08+09:00'
+updated_at: '2026-05-28T12:36:33+09:00'
 id: 7344c85429bec74672d9
 organization_url_name: null
 slide: false
