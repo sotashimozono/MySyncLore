@@ -7,7 +7,7 @@ tags:
   - doiget
   - renormalization
 private: false
-updated_at: '2026-06-18T04:21:34+09:00'
+updated_at: '2026-06-18T06:55:48+09:00'
 id: edd53a55ad85e9fa8b7e
 organization_url_name: null
 slide: false
