@@ -7,7 +7,7 @@ tags:
   - PKM
   - paper-management
 private: false
-updated_at: '2026-07-03T19:37:27+09:00'
+updated_at: '2026-07-03T21:52:56+09:00'
 id: 3857c0bad8abdf0f4cff
 organization_url_name: null
 slide: false
