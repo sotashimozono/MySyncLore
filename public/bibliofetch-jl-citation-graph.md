@@ -7,7 +7,7 @@ tags:
   - citation
   - paper-management
 private: false
-updated_at: '2026-07-16T21:16:52+09:00'
+updated_at: '2026-07-16T23:55:43+09:00'
 id: 776d82cd84c58662d6ce
 organization_url_name: null
 slide: false
