@@ -1,13 +1,13 @@
 ---
 title: BiblioFetch.jl の vault と job.toml — 文献コレクションを git 管理可能な平文で持つ
 tags:
-  - Julia
-  - TOML
   - BibTeX
-  - PKM
+  - Julia
   - paper-management
+  - PKM
+  - TOML
 private: false
-updated_at: '2026-07-17T11:08:04+09:00'
+updated_at: '2026-07-17T14:36:06+09:00'
 id: 3857c0bad8abdf0f4cff
 organization_url_name: null
 slide: false

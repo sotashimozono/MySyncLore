@@ -1,13 +1,13 @@
 ---
 title: AI coding agent (Claude Code) 目線の doiget を用いた local ベース先行研究調査
 tags:
-  - OSS
-  - Ising
-  - paper-management
   - doiget
+  - Ising
+  - OSS
+  - paper-management
   - renormalization
 private: false
-updated_at: '2026-07-17T11:08:04+09:00'
+updated_at: '2026-07-17T14:36:06+09:00'
 id: edd53a55ad85e9fa8b7e
 organization_url_name: null
 slide: false

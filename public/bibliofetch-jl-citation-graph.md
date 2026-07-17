@@ -1,13 +1,13 @@
 ---
 title: BiblioFetch.jl で論文 1 本から citation graph を辿って関連 PDF も全部回収する
 tags:
-  - Julia
-  - BibTeX
   - arXiv
+  - BibTeX
   - citation
+  - Julia
   - paper-management
 private: false
-updated_at: '2026-07-17T11:08:04+09:00'
+updated_at: '2026-07-17T14:36:06+09:00'
 id: 776d82cd84c58662d6ce
 organization_url_name: null
 slide: false
