@@ -7,7 +7,7 @@ tags:
   - paper-management
   - renormalization
 private: false
-updated_at: '2026-08-15T21:25:23+09:00'
+updated_at: '2026-08-15T22:25:31+09:00'
 id: edd53a55ad85e9fa8b7e
 organization_url_name: null
 slide: false
