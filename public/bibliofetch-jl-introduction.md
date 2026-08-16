@@ -7,7 +7,7 @@ tags:
   - OSS
   - paper-management
 private: false
-updated_at: '2026-08-16T12:42:32+09:00'
+updated_at: '2026-08-16T13:29:20+09:00'
 id: cd497265db47f38124b2
 organization_url_name: null
 slide: false
