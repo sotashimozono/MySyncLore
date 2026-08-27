@@ -7,7 +7,7 @@ tags:
   - PKM
   - TOML
 private: false
-updated_at: '2026-08-27T22:37:10+09:00'
+updated_at: '2026-08-28T08:28:41+09:00'
 id: 3857c0bad8abdf0f4cff
 organization_url_name: null
 slide: false
