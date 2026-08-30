@@ -7,7 +7,7 @@ tags:
   - paper-management
   - Research
 private: false
-updated_at: '2026-08-30T21:30:20+09:00'
+updated_at: '2026-08-31T02:07:36+09:00'
 id: 3d073a33b0cabc2d19d9
 organization_url_name: null
 slide: false
