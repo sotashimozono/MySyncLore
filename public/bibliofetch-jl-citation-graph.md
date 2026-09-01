@@ -7,7 +7,7 @@ tags:
   - Julia
   - paper-management
 private: false
-updated_at: '2026-09-01T21:58:27+09:00'
+updated_at: '2026-09-02T02:13:08+09:00'
 id: 776d82cd84c58662d6ce
 organization_url_name: null
 slide: false
